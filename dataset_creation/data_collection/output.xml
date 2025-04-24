@@ -1,0 +1,634 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-stylesheet type="text/xsl" href="xslt/oai2.xsl"?>
+<?xml version="1.0" ?>
+<OAI-PMH schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+  <responseDate>2025-04-24T09:08:20Z</responseDate>
+  <request verb="ListSets">http://www.culturaitalia.it/oaiProviderCI/OAIHandler</request>
+  <ListSets>
+    <set>
+      <setSpec>ic_tecaiccu</setSpec>
+      <setName>Teca ICCU</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>amshistorica</setSpec>
+      <setName>AMS Historica Bologna</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>iccu_anagrafe_biblioteche</setSpec>
+      <setName>ICCU Anagrafe delle biblioteche italiane</setName>
+      <setDescription>Anagrafe delle Biblioteche Italiane</setDescription>
+    </set>
+    <set>
+      <setSpec>regione_marche</setSpec>
+      <setName>Regione Marche</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>polo_mus_abruzzo_3d</setSpec>
+      <setName>Polo Museale dell'Abruzzo</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>archeo_marche</setSpec>
+      <setName>Regione Marche - Archeologia</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>regione_er_archeo</setSpec>
+      <setName>Regione Emilia Romagna - Archeologia</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>regione_cal_ra</setSpec>
+      <setName>Regione Calabria - Reperti Archeologici</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>ic_images</setSpec>
+      <setName>Internet Culturale - immagini</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>ic_bu_genova</setSpec>
+      <setName>Biblioteca Universitaria - Genova</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>byterfly</setSpec>
+      <setName>Byterfly</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>regione_lom_oav</setSpec>
+      <setName>Regione Lombardia - OAV</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>regione_lom_ba</setSpec>
+      <setName>Regione Lombardia - Beni archeologici</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>regione_lom_b_antro</setSpec>
+      <setName>Regione Lombardia - beni antropologici</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>regione_lom_dis</setSpec>
+      <setName>Regione Lombardia - disegni</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>regione_lom_oaa</setSpec>
+      <setName>Regione Lombardia - oaa</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>regione_lom_strum</setSpec>
+      <setName>Regione Lombardia - Strumenti</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>ic_icbsa_roma</setSpec>
+      <setName>Istituto Centrale per i Beni Sonori ed Audiovisivi - Roma</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>byterfly_bnb</setSpec>
+      <setName>Byterfly - Biblioteca Norberto Bobbio</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>ic_bcah_trieste</setSpec>
+      <setName>Biblioteca Civica Attilio Hortis - Trieste</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>reg_um_oa</setSpec>
+      <setName>Regione Umbria - opere d'arte</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>reg_um_n</setSpec>
+      <setName>Regione Umbria - beni numismatici</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>reg_um_ba</setSpec>
+      <setName>Regione Umbria - beni archeologici</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>museiditalia_coll</setSpec>
+      <setName>Musei d'Italia - collezioni</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>museiditalia_musei</setSpec>
+      <setName>Musei d'Italia - musei</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>reg_oa_um_s_r</setSpec>
+      <setName>Regione Umbria - OA - senza ranieri</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>ic_bnm_venezia</setSpec>
+      <setName>Biblioteca Nazionale Marciana - Venezia</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>byterfly_bsefle</setSpec>
+      <setName>Byterfly - Biblioteca storico-economica Fondazione L.Einaudi</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>ic_bnb_milano</setSpec>
+      <setName>Biblioteca Nazionale Braidense - Milano</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>sigec_fibula_puglia</setSpec>
+      <setName>SigecWeb - fibula</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>san_sias</setSpec>
+      <setName>SAN - Sistema Archivistico Nazionale - SIAS</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>san_archivi_musica</setSpec>
+      <setName>SAN - Archivi della Musica</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>ic_bu_pisa</setSpec>
+      <setName>Biblioteca Universitaria - Pisa</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>campi_fascisti</setSpec>
+      <setName>Campi fascisti</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>ic_bca_pg</setSpec>
+      <setName>Biblioteca Comunale Augusta - Perugia</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>ic_cinema_to_cinema_rm</setSpec>
+      <setName>Museo Nazionale del Cinema - Torino; Centro Sperimentale di Cinematografia - Cineteca Nazionale - Roma</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>san_cosenza</setSpec>
+      <setName>SAN - Cosenza</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>manoscritti_ic</setSpec>
+      <setName>Manoscritti Internet Culturale</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>monete_medaglie</setSpec>
+      <setName>Monete e Medaglie</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>medagliere_serie_romana</setSpec>
+      <setName>Il medagliere serie romana</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>museiditalia_opere_monete</setSpec>
+      <setName>MuseiD-Italia-monete</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>museid_archeo_coll</setSpec>
+      <setName>MuseiD collezioni archeologiche</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>san_architetti</setSpec>
+      <setName>SAN - Architetti</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>dir_lomb_ba</setSpec>
+      <setName>Direzione Regionale Lombardia - beni archeologici</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>coll_archeo_prova</setSpec>
+      <setName>Prova Archeologica</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>europeana_f_e_d</setSpec>
+      <setName>Europeana Food &amp; Drink</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>museid_oa_parthenos</setSpec>
+      <setName>MuseiD-Italia - opere d'arte visiva</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>gam_torino_ftm</setSpec>
+      <setName>GAM - Galleria Civica d'Arte Moderna e Contemporanea</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>ing_civ_arch</setSpec>
+      <setName>Ingegneria civile e architettura</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>giar_parchi</setSpec>
+      <setName>Giardini e parchi</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>aree_mon</setSpec>
+      <setName>Aree monumentali</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>architettura</setSpec>
+      <setName>Architettura</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>abitazioni</setSpec>
+      <setName>Abitazioni</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>edi_rel</setSpec>
+      <setName>Edifici Religiosi</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>palazzi</setSpec>
+      <setName>Palazzi</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>edi_strut_dif</setSpec>
+      <setName>Edifici - strutture di difesa</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>monumenti</setSpec>
+      <setName>Monumenti</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>ben_urb</setSpec>
+      <setName>Beni urbanistici</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>mura_fort</setSpec>
+      <setName>Mura - Fortificazioni</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>quar_storici</setSpec>
+      <setName>Quartieri Storici</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>mus_pigorini_arc</setSpec>
+      <setName>Museo Nazionale Preistorico Etnografico L. Pigorini</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>rise_of_literacy</setSpec>
+      <setName>Rise of Literacy</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>cnr_ovi</setSpec>
+      <setName>CNR OVI</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>biblio_alessandrina_manoscritti</setSpec>
+      <setName>Biblioteca universitaria Alessandrina Manoscritti</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>biblio_alessandrina_pop</setSpec>
+      <setName>Biblioteca universitaria Alessandrina - Letteratura popolare</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>nuovo_allestimento_villa_frigerj</setSpec>
+      <setName>Il nuovo allestimento del Museo Archeolgico Nazionale Villa Frigerj</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>collezione_pansa_villa_frigerj</setSpec>
+      <setName>La collezione Pansa nel Museo Archeologico Nazionale d'Abruzzo Villa Frigerj</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>volti_votivi_frigerj</setSpec>
+      <setName>I volti votivi dai santuari italici</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>collezione_archeologica_frigerj</setSpec>
+      <setName>Museo Archeologico Nazionale - Collezione Archeologica</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>mus_arch_la_civitella</setSpec>
+      <setName>Museo Archeologico La Civitella</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>mus_arch_celano</setSpec>
+      <setName>Opere del Museo Archeologico Collezione</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>coll_pigorini_roma</setSpec>
+      <setName>Collezioni dell'Istituto S-MNPE L. Pigorini - Roma</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>cnr_ovi_plutei</setSpec>
+      <setName>CNR OVI Plutei</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>museiditalia_luoghi</setSpec>
+      <setName>MuseiD-Italia Luoghi</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>bib_estense</setSpec>
+      <setName>Biblioteca Estense Universitaria - Modena</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>cnr_ovi_manoscritti</setSpec>
+      <setName>CNR OVI Manoscritti</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>san_imprese</setSpec>
+      <setName>SAN - Imprese</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>biblio_dig_trento</setSpec>
+      <setName>Biblioteca Digitale Trentina</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>opere_museid</setSpec>
+      <setName>MuseiD-Italia - opere</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>phaidra_unipd</setSpec>
+      <setName>PHAIDRA - Università di Padova</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>fondo_gab_ftm</setSpec>
+      <setName>Archivio Fotografico - Fondo Gabinio</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>palazzo_madama_ftm</setSpec>
+      <setName>Palazzo Madama</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>mao_ftm</setSpec>
+      <setName>MAO - Museo Arte Orientale</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>bib_char_paola</setSpec>
+      <setName>Biblioteca Charitas Paola</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>ma_na_villa_frigerj</setSpec>
+      <setName>Museo Archeologico Nazionale d'Abruzzo, Villa Frigerj</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>biasa_ra</setSpec>
+      <setName>Biblioteca di Archeologia e Storia dell'arte di Roma</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>san_datini_archive</setSpec>
+      <setName>SAN - Datini</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>trademarks</setSpec>
+      <setName>Marchi e modelli</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>pergamene_sias</setSpec>
+      <setName>Pergamene SIAS</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>icrcpal</setSpec>
+      <setName>ICRCPAL</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>drma_3d</setSpec>
+      <setName>Direzione Regionale Musei Abruzzo</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>aspr_quirinale</setSpec>
+      <setName>Archivio Storico della Presidenza della Repubblica</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>risorgimento</setSpec>
+      <setName>Istituto per la storia del Risorgimento italiano</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>san_ant_camp</setSpec>
+      <setName>SAN - Antenati Campobasso</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>san_ant_mod</setSpec>
+      <setName>SAN - Archivio Modena</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>san_marche</setSpec>
+      <setName>Soprintendenza ai monumenti per le Marche</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>san_moda</setSpec>
+      <setName>SAN Moda</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>san_catasti</setSpec>
+      <setName>SAN - Catasti</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>fram_mano_bol</setSpec>
+      <setName>Frammenti manoscritti Archivio di Bologna</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>stampa_sportiva_1</setSpec>
+      <setName>La Stampa Sportiva 1</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>regione_sardegna</setSpec>
+      <setName>Regione Sardegna</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>stampa_sportiva_2</setSpec>
+      <setName>La Stampa Sportiva 2</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>stampa_sportiva_3</setSpec>
+      <setName>La Stampa Sportiva 3</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>sigec_sardegna</setSpec>
+      <setName>SigecWeb Regione Sardegna</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>eurosport_littoriale</setSpec>
+      <setName>Scuola dello Sport - Biblioteca Sportiva Nazionale - Sport e Salute</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>bib_est_uni</setSpec>
+      <setName>Biblioteca Estense Universitaria</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>unipd_ico_geo</setSpec>
+      <setName>Uni Padova Iconoteca dei geologi</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>uni_pd_erbari_illustrati</setSpec>
+      <setName>Uni Padova - Erbari illustrati della biblioteca dell'Orto botanico di Padova</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>uni_pd_ico_orti_bot</setSpec>
+      <setName>Uni Padova Iconoteca degli orti botanici</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>unipd_perg_arc_sm_carc</setSpec>
+      <setName>PHAIDRA - Uni Padova - Pergamene dall'archivio di S. Maria delle Carceri</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>archivio_paolo_salvati</setSpec>
+      <setName>Archivio Paolo Salvati</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>bib_com_moz_bor_mac</setSpec>
+      <setName>Biblioteca Comunale Mozzi-Borgetti - Macerata </setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>ist_sturzo_il_popolo</setSpec>
+      <setName>Istituto Sturzo - Il popolo</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>ist_sturzo_arc_gronchi</setSpec>
+      <setName>Istituto Sturzo - Archivio Gronchi</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>ist_sturzo_fotografie</setSpec>
+      <setName>Istituto Sturzo - Fotografie</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>bncr_giornali_storici</setSpec>
+      <setName>Biblioteca Nazionale Centrale di Roma - Giornali storici</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>bncr_maniscritti_moderni</setSpec>
+      <setName>Biblioteca Nazionale Centrale di Roma - Manoscritti moderni</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>bncr_registrazioni_sonore</setSpec>
+      <setName>Biblioteca Nazionale Centrale di Roma - Registrazioni sonore</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>bncr_riviste</setSpec>
+      <setName>Biblioteca Nazionale Centrale di Roma - Riviste</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>bncr_fotografie</setSpec>
+      <setName>Biblioteca Nazionale Centrale di Roma - Fotografie</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>bncr_spartiti</setSpec>
+      <setName>Biblioteca Nazionale Centrale di Roma - Spartiti</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>brixiana</setSpec>
+      <setName>Brixiana</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>twinit</setSpec>
+      <setName>Twinit</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>bncr_giornali_moderni</setSpec>
+      <setName>Biblioteca Nazionale Centrale di Roma - Giornali moderni</setName>
+      <setDescription/>
+    </set>
+    <set>
+      <setSpec>bib_braidense_part_1</setSpec>
+      <setName>Biblioteca Nazionale Bradiense - parte 1</setName>
+      <setDescription/>
+    </set>
+  </ListSets>
+</OAI-PMH>

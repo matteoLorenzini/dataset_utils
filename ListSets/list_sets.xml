@@ -2,7 +2,7 @@
 <?xml-stylesheet type="text/xsl" href="xslt/oai2.xsl"?>
 <?xml version="1.0" ?>
 <OAI-PMH schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
-  <responseDate>2025-04-24T09:08:20Z</responseDate>
+  <responseDate>2025-04-24T09:57:08Z</responseDate>
   <request verb="ListSets">http://www.culturaitalia.it/oaiProviderCI/OAIHandler</request>
   <ListSets>
     <set>

@@ -92,8 +92,13 @@ def save_to_xml(records, output_file, stylesheet=None):
         for record in records:
             record_elem = ET.SubElement(root, "record")
             for key, value in record.items():
-                child = ET.SubElement(record_elem, key)
-                child.text = value
+                if key in ["type", "subject"] and value:  # Handle splitting for 'type' and 'subject'
+                    for item in value.split("; "):  # Split by "; " and create separate tags
+                        child = ET.SubElement(record_elem, key)
+                        child.text = item
+                else:
+                    child = ET.SubElement(record_elem, key)
+                    child.text = value
 
         # Convert the XML tree to a string
         cleaned_xml = ET.tostring(root, encoding="unicode")

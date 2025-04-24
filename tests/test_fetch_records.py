@@ -4,9 +4,9 @@ from dataset_creation.data_collection.fetch_records import fetch_records
 class TestFetchRecords(unittest.TestCase):
     def test_fetch_records_valid(self):
         # Mock a valid endpoint and response
-        endpoint = "https://example.com/oai"
+        endpoint = "https://www.culturaitalia.it/oaiProviderCI/OAIHandler"
         verb = "ListRecords"
-        set_name = "example_set"
+        set_name = "museid_oa_parthenos"
         test_limit = 5
 
         # Simulate fetching records (mocking the actual HTTP request is recommended)
@@ -16,7 +16,7 @@ class TestFetchRecords(unittest.TestCase):
 
     def test_fetch_records_invalid_endpoint(self):
         # Test with an invalid endpoint
-        endpoint = "https://invalid-url.com/oai"
+        endpoint = "https://www.culturaitalia.it/oaiProviderCI/OAIHandler"
         verb = "ListRecords"
         with self.assertRaises(SystemExit):
             fetch_records(endpoint, verb)

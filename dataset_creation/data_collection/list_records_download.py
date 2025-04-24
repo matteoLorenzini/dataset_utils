@@ -1,5 +1,6 @@
-import argparse
 import os
+import sys
+import questionary
 from fetch_records import fetch_records
 from save_records import save_to_csv, save_to_xml
 
@@ -18,30 +19,56 @@ VERBS = {
 }
 
 def main():
-    parser = argparse.ArgumentParser(description="Fetch and save records or perform other OAI-PMH operations.")
-    parser.add_argument("dataset_name", nargs="?", help="The name of the dataset to fetch.")
-    parser.add_argument("output_file", help="The file to save the fetched data.")
-    parser.add_argument("-e", "--endpoint", choices=ENDPOINTS.keys(), required=True, help="The endpoint to fetch data from.")
-    parser.add_argument("-v", "--verb", choices=VERBS.keys(), required=True, help="The OAI-PMH verb to use.")
-    parser.add_argument("--test", action="store_true", help="Limit the fetch to 20 records for testing purposes.")
-    parser.add_argument("--save-xml", action="store_true", help="Save the ListRecords output as an XML file.")
-    args = parser.parse_args()
+    # Define the interactive prompts using questionary
+    endpoint = questionary.select(
+        "Choose the endpoint to fetch data from:",
+        choices=[f"{key}: {value}" for key, value in ENDPOINTS.items()]
+    ).ask()
 
-    endpoint = ENDPOINTS[args.endpoint]
-    verb = VERBS[args.verb]
-    dataset_name = args.dataset_name
-    output_file = args.output_file
-    test_limit = 20 if args.test else None
+    verb = questionary.select(
+        "Choose the OAI-PMH verb to use:",
+        choices=[f"{key}: {value}" for key, value in VERBS.items()]
+    ).ask()
 
+    dataset_name = questionary.text(
+        "Enter the dataset name (leave blank if not required):",
+        default=""
+    ).ask()
+
+    output_file = questionary.text(
+        "Enter the output file name (e.g., output.csv):",
+        default="output.csv"
+    ).ask()
+
+    test = questionary.confirm(
+        "Do you want to limit the fetch to 20 records for testing?",
+        default=False
+    ).ask()
+
+    save_xml = questionary.confirm(
+        "Do you want to save the output as an XML file?",
+        default=False
+    ).ask()
+
+    # Parse the selected options
+    endpoint_key = endpoint.split(':')[0]
+    verb_key = verb.split(':')[0]
+    endpoint = ENDPOINTS[endpoint_key]
+    verb = VERBS[verb_key]
+    test_limit = 20 if test else None
+
+    # Validate dataset_name if required
     if verb in ["ListRecords", "ListIdentifiers"] and not dataset_name:
         print(f"Error: The dataset_name argument is required for the '{verb}' verb.")
         sys.exit(1)
 
+    # Fetch records
     result = fetch_records(endpoint, verb, set_name=dataset_name, test_limit=test_limit)
 
+    # Save records
     if verb == "ListRecords":
         save_to_csv(result, output_file)
-        if args.save_xml:
+        if save_xml:
             xml_output_file = output_file.replace(".csv", ".xml")
             xslt_path = os.path.join("xslt", "oai2.xsl")
             save_to_xml(result, xml_output_file, stylesheet=xslt_path)

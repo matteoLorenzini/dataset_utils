@@ -1,128 +1,262 @@
-import os
+import requests
+import xml.etree.ElementTree as ET
+import csv
 import sys
-import questionary
-from fetch_records import fetch_records
-from save_records import save_to_csv, save_to_xml
+from tqdm import tqdm
+import argparse
+from xml.dom.minidom import parseString
+import os
 
+# Define a dictionary of available endpoints with short options
 ENDPOINTS = {
     "a": "https://www.culturaitalia.it/oaiProviderCI/OAIHandler",
     "b": "https://example1.com/oai",
     "c": "https://example2.com/oai"
 }
 
+# Define a dictionary of OAI-PMH verbs with numeric arguments
 VERBS = {
     "1": "Identify",
     "2": "ListIdentifiers",
     "3": "ListMetadataFormats",
     "4": "ListSets",
-    "5": "ListRecords"
+    "5": "ListRecords"  # Default verb
 }
 
-def interactive_main():
-    # Define the interactive prompts using questionary
-    endpoint = questionary.select(
-        "Choose the endpoint to fetch data from:",
-        choices=[f"{key}: {value}" for key, value in ENDPOINTS.items()]
-    ).ask()
+def strip_namespace(element):
+    """
+    Remove namespaces from an XML element and its children.
 
-    verb = questionary.select(
-        "Choose the OAI-PMH verb to use:",
-        choices=[f"{key}: {value}" for key, value in VERBS.items()]
-    ).ask()
+    Args:
+        element (xml.etree.ElementTree.Element): The XML element to process.
 
-    dataset_name = questionary.text(
-        "Enter the dataset name (leave blank if not required):",
-        default=""
-    ).ask()
+    Returns:
+        xml.etree.ElementTree.Element: The XML element without namespaces.
+    """
+    for elem in element.iter():
+        if '}' in elem.tag:
+            elem.tag = elem.tag.split('}', 1)[1]  # Remove namespace
+        elem.attrib = {key.split('}', 1)[-1]: value for key, value in elem.attrib.items()}  # Remove namespace from attributes
+    return element
 
-    output_file = questionary.text(
-        "Enter the output file name (e.g., output.csv):",
-        default="output.csv"
-    ).ask()
+def save_raw_output(output, output_file, stylesheet=None):
+    """
+    Save raw output (e.g., XML) to a file with proper formatting and optional XSL stylesheet.
 
-    test = questionary.confirm(
-        "Do you want to limit the fetch to 20 records for testing?",
-        default=False
-    ).ask()
+    Args:
+        output (str): The raw XML output to save.
+        output_file (str): The file to save the output to.
+        stylesheet (str, optional): The path to an XSL stylesheet to include in the XML.
+    """
+    try:
+        # Parse the XML and strip namespaces
+        root = ET.fromstring(output)
+        root = strip_namespace(root)
 
-    save_xml = questionary.confirm(
-        "Do you want to save the output as an XML file?",
-        default=False
-    ).ask()
+        # Convert the cleaned XML back to a string
+        cleaned_xml = ET.tostring(root, encoding="unicode")
 
-    # Parse the selected options
-    endpoint_key = endpoint.split(':')[0]
-    verb_key = verb.split(':')[0]
-    endpoint = ENDPOINTS[endpoint_key]
-    verb = VERBS[verb_key]
-    test_limit = 20 if test else None
+        # Pretty-print the XML
+        dom = parseString(cleaned_xml)
+        pretty_xml = dom.toprettyxml(indent="  ")
 
-    # Print selected options
-    print(f"Endpoint: {endpoint}")
-    print(f"Verb: {verb}")
-    print(f"Dataset Name: {dataset_name}")
-    print(f"Output File: {output_file}")
-    print(f"Test Limit: {test_limit}")
+        # Add optional XSL stylesheet
+        if stylesheet:
+            stylesheet_declaration = f'<?xml-stylesheet type="text/xsl" href="{stylesheet}"?>\n'
+            pretty_xml = pretty_xml.replace('<?xml version="1.0" encoding="UTF-8"?>', f'<?xml version="1.0" encoding="UTF-8"?>\n{stylesheet_declaration}')
 
-    # Validate dataset_name if required
-    if verb in ["ListRecords", "ListIdentifiers"] and not dataset_name:
-        print(f"Error: The dataset_name argument is required for the '{verb}' verb.")
+        # Save the formatted XML to the file
+        with open(output_file, mode='w', encoding='utf-8') as file:
+            file.write(pretty_xml)
+    except Exception as e:
+        print(f"Error saving raw output to file: {e}")
         sys.exit(1)
 
-    # Fetch records with resumption token handling
-    all_records = []
-    resumption_token = None
+def save_to_xml(records, output_file, stylesheet=None):
+    """
+    Save records to an XML file with optional XSL stylesheet.
 
-    while True:
-        result, resumption_token = fetch_records(endpoint, verb, set_name=dataset_name, test_limit=test_limit, resumption_token=resumption_token)
-        all_records.extend(result)
+    Args:
+        records (list): The list of records to save.
+        output_file (str): The file to save the XML output to.
+        stylesheet (str, optional): The path to an XSL stylesheet to include in the XML.
+    """
+    try:
+        # Create the root element
+        root = ET.Element("ListRecords")
 
-        if not resumption_token:
-            break
+        # Add each record as a child element
+        for record in records:
+            record_elem = ET.SubElement(root, "record")
+            for key, value in record.items():
+                if key in ["type", "subject"] and value:  # Handle splitting for 'type' and 'subject'
+                    for item in value.split("; "):  # Split by "; " and create separate tags
+                        child = ET.SubElement(record_elem, key)
+                        child.text = item
+                else:
+                    child = ET.SubElement(record_elem, key)
+                    child.text = value
 
-    # Save records
-    if verb == "ListRecords":
-        save_to_csv(all_records, output_file)
-        if save_xml:
-            xml_output_file = output_file.replace(".csv", ".xml")
-            xslt_path = os.path.join("xslt", "oai2.xsl")
-            save_to_xml(all_records, xml_output_file, stylesheet=xslt_path)
-    else:
-        print("Non-ListRecords verbs are not yet supported.")
+        # Convert the XML tree to a string
+        cleaned_xml = ET.tostring(root, encoding="unicode")
+
+        # Pretty-print the XML
+        dom = parseString(cleaned_xml)
+        pretty_xml = dom.toprettyxml(indent="  ")
+
+        # Add optional XSL stylesheet
+        if stylesheet:
+            stylesheet_declaration = f'<?xml-stylesheet type="text/xsl" href="{stylesheet}"?>\n'
+            pretty_xml = pretty_xml.replace('<?xml version="1.0" encoding="UTF-8"?>', f'<?xml version="1.0" encoding="UTF-8"?>\n{stylesheet_declaration}')
+
+        # Save the formatted XML to the file
+        with open(output_file, mode='w', encoding='utf-8') as file:
+            file.write(pretty_xml)
+    except Exception as e:
+        print(f"Error saving records to XML: {e}")
+        sys.exit(1)
+
+def fetch_records(endpoint, verb, set_name=None, metadata_prefix="pico", test_limit=None):
+    """
+    Fetch records or perform other OAI-PMH operations from the endpoint.
+
+    Args:
+        endpoint (str): The OAI-PMH endpoint URL.
+        verb (str): The OAI-PMH verb to use (e.g., "ListRecords").
+        set_name (str, optional): The dataset name (set) for "ListRecords" or "ListIdentifiers".
+        metadata_prefix (str, optional): The metadata prefix (default: "pico").
+        test_limit (int, optional): Limit the number of records fetched for testing purposes.
+
+    Returns:
+        list or str: A list of fetched records (for ListRecords) or raw XML output (for other verbs).
+    """
+    records = []
+    params = {
+        "verb": verb
+    }
+    if set_name and verb in ["ListRecords", "ListIdentifiers"]:
+        params["set"] = set_name
+    if metadata_prefix and verb in ["ListRecords", "ListIdentifiers"]:
+        params["metadataPrefix"] = metadata_prefix
+
+    try:
+        with tqdm(desc=f"Fetching {verb.lower()}", unit="record", bar_format="{l_bar}{bar}| {n_fmt} records [{elapsed}<{remaining}, {rate_fmt}]") as pbar:
+            response = requests.get(endpoint, params=params)
+            if response.status_code != 200:
+                print(f"Error: Unable to fetch data. HTTP Status Code: {response.status_code}")
+                sys.exit(1)
+            
+            root = ET.fromstring(response.content)
+            ns = {
+                'oai': 'http://www.openarchives.org/OAI/2.0/',
+                'dc': 'http://purl.org/dc/elements/1.1/',
+                'pico': 'http://purl.org/pico/1.0/',
+                'dcterms': 'http://purl.org/dc/terms/'
+            }
+            
+            if verb == "ListRecords":
+                found_records = False
+                for record in root.findall('.//pico:record', ns):  # Adjusted to find <pico:record>
+                    identifier = record.find('dc:identifier', ns)
+                    title = record.find('dc:title', ns)
+                    description = record.find('dc:description', ns)
+                    
+                    # Handle multiple dc:subject elements
+                    subjects = record.findall('dc:subject', ns)
+                    subject_values = "; ".join(subject.text or "" for subject in subjects if subject is not None)
+                    
+                    # Handle multiple dc:type elements
+                    types = record.findall('dc:type', ns)
+                    type_values = "; ".join(type_.text or "" for type_ in types if type_ is not None)
+                    
+                    records.append({
+                        "identifier": identifier.text if identifier is not None else "",
+                        "title": title.text if title is not None else "",
+                        "description": description.text if description is not None else "",
+                        "type": type_values,
+                        "subject": subject_values
+                    })
+                    pbar.update(1)
+                    found_records = True
+
+                    # Stop fetching if test limit is reached
+                    if test_limit and len(records) >= test_limit:
+                        print("\nTest limit reached. Stopping fetch.")
+                        return records
+                
+                if not found_records:
+                    print("No records found.")
+                return records
+            else:
+                # For other verbs, return the raw XML response
+                return ET.tostring(root, encoding="unicode")
+
+    except Exception as e:
+        print(f"Error during fetching data: {e}")
+        sys.exit(1)
+
+def save_to_csv(records, output_file):
+    try:
+        with open(output_file, mode='w', newline='', encoding='utf-8') as csvfile:
+            fieldnames = ["identifier", "title", "description", "type", "subject"]
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            
+            writer.writeheader()
+            for record in records:
+                writer.writerow(record)
+    except Exception as e:
+        print(f"Error saving to CSV: {e}")
+        sys.exit(1)
 
 def main():
-    if len(sys.argv) < 4:
-        print("Usage: python list_records_download.py <verb> <dataset_name> <output_file> [--test] [--xml] [--csv]")
-        print("Example: python list_records_download.py ListRecords museid_oa_parthenos output output.csv --test --xml --csv")
-        sys.exit(1)
-    
-    verb = sys.argv[1]
-    dataset_name = sys.argv[2]
-    output_file = sys.argv[3]
-    test = "--test" in sys.argv
-    save_as_xml = "--xml" in sys.argv
-    save_as_csv = "--csv" in sys.argv
-    endpoint = "https://www.culturaitalia.it/oaiProviderCI/OAIHandler"
+    parser = argparse.ArgumentParser(description="Fetch and save OAI-PMH records.")
+    parser.add_argument("-e", "--endpoint", choices=["a", "b", "c"], required=True, help="Select the endpoint.")
+    parser.add_argument("-v", "--verb", choices=["1", "2", "3", "4", "5"], required=True, help="Select the OAI-PMH verb.")
+    parser.add_argument("dataset_name", nargs="?", help="The dataset name (optional).")
+    parser.add_argument("output_file", help="The output file name.")
+    parser.add_argument("--test", action="store_true", help="Limit to 20 records for testing.")
+    parser.add_argument("--save-xml", action="store_true", help="Save the output as XML.")
+    parser.add_argument("--save-csv", action="store_true", help="Save the output as CSV.")
 
-    if not save_as_xml and not save_as_csv:
-        print("Error: You must specify at least one output format: --xml or --csv.")
-        sys.exit(1)
+    args = parser.parse_args()
 
-    print(f"Fetching records for dataset: {dataset_name} with verb: {verb}")
-    records = fetch_records(endpoint, dataset_name, verb=verb, test_limit=20 if test else None)
-    print(f"Fetched {len(records)} records.")
+    # Map endpoint keys to URLs
+    endpoint = {
+        "a": "https://www.culturaitalia.it/oaiProviderCI/OAIHandler",
+        "b": "https://example1.com/oai",
+        "c": "https://example2.com/oai"
+    }[args.endpoint]
 
-    if save_as_csv:
-        csv_output_file = output_file if output_file.endswith(".csv") else f"{output_file}.csv"
-        print(f"Saving records to {csv_output_file}")
-        save_to_csv(records, csv_output_file)
+    # Map verb keys to OAI-PMH verbs
+    verb = {
+        "1": "Identify",
+        "2": "ListIdentifiers",
+        "3": "ListMetadataFormats",
+        "4": "ListSets",
+        "5": "ListRecords"
+    }[args.verb]
 
-    if save_as_xml:
-        xml_output_file = output_file if output_file.endswith(".xml") else f"{output_file}.xml"
-        print(f"Saving records to {xml_output_file}")
-        save_to_xml(records, xml_output_file)
+    # Fetch records or perform the requested OAI-PMH operation
+    print(f"Fetching data from endpoint: {endpoint} with verb: {verb}")
+    if verb == "ListRecords":
+        records = fetch_records(endpoint, verb, set_name=args.dataset_name, test_limit=20 if args.test else None)
+        if args.save_xml:
+            xml_output_file = args.output_file if args.output_file.endswith(".xml") else f"{args.output_file}.xml"
+            print(f"Saving records as XML to {xml_output_file}")
+            save_to_xml(records, xml_output_file)
+        if args.save_csv:
+            csv_output_file = args.output_file if args.output_file.endswith(".csv") else f"{args.output_file}.csv"
+            print(f"Saving records as CSV to {csv_output_file}")
+            save_to_csv(records, csv_output_file)
+    else:
+        # For other verbs, fetch raw XML output
+        raw_output = fetch_records(endpoint, verb, set_name=args.dataset_name)
+        if args.save_xml:
+            xml_output_file = args.output_file if args.output_file.endswith(".xml") else f"{args.output_file}.xml"
+            print(f"Saving raw output as XML to {xml_output_file}")
+            save_raw_output(raw_output, xml_output_file)
 
-    print("Done.")
+    print("Operation completed successfully.")
 
 if __name__ == "__main__":
     main()

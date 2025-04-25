@@ -2,10 +2,11 @@ import xml.etree.ElementTree as ET
 from xml.dom.minidom import parseString
 import csv
 import sys
+import os
 
 def save_to_xml(records, output_file, stylesheet=None):
     """
-    Save records to an XML file with optional XSL stylesheet.
+    Save records to an XML file with an optional XSL stylesheet.
     """
     try:
         root = ET.Element("ListRecords")
@@ -20,17 +21,19 @@ def save_to_xml(records, output_file, stylesheet=None):
                     child = ET.SubElement(record_elem, key)
                     child.text = value
 
+        # Convert the XML tree to a string
         cleaned_xml = ET.tostring(root, encoding="unicode")
         dom = parseString(cleaned_xml)
         pretty_xml = dom.toprettyxml(indent="  ")
 
-        xml_declaration = '<?xml version="1.0" encoding="UTF-8" ?>\n'
+        # Add optional XSL stylesheet
         if stylesheet:
-            xml_declaration += f'<?xml-stylesheet type="text/xsl" href="{stylesheet}"?>\n'
+            stylesheet_declaration = f'<?xml-stylesheet type="text/xsl" href="{stylesheet}"?>\n'
+            pretty_xml = pretty_xml.replace('<?xml version="1.0" encoding="UTF-8"?>', f'<?xml version="1.0" encoding="UTF-8"?>\n{stylesheet_declaration}')
 
-        formatted_output = xml_declaration + pretty_xml
+        # Save the formatted XML to the file
         with open(output_file, mode='w', encoding='utf-8') as file:
-            file.write(formatted_output)
+            file.write(pretty_xml)
     except Exception as e:
         print(f"Error saving records to XML: {e}")
         sys.exit(1)

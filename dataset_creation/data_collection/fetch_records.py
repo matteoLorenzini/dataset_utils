@@ -23,20 +23,31 @@ def fetch_records(endpoint, verb, set_name=None, test_limit=None, resumption_tok
     else:
         if set_name:
             params["set"] = set_name
-        if test_limit:
-            params["metadataPrefix"] = "oai_dc"
-            params["test_limit"] = test_limit  # Custom parameter for testing
+        params["metadataPrefix"] = "oai_dc"  # Default metadata format
 
-    response = requests.get(endpoint, params=params)
-    response.raise_for_status()
+    try:
+        response = requests.get(endpoint, params=params)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching records: {e}")
+        sys.exit(1)
 
-    # Parse the response (assuming XML response)
-    records = []  # Extract records from the response
-    next_resumption_token = None  # Extract resumptionToken from the response if present
+    # Parse the XML response
+    try:
+        root = ET.fromstring(response.content)
+    except ET.ParseError as e:
+        print(f"Error parsing XML response: {e}")
+        sys.exit(1)
 
-    # Example parsing logic (you need to implement actual XML parsing)
-    # Use an XML parser like xml.etree.ElementTree or lxml to extract data
-    # records = parse_records(response.content)
-    # next_resumption_token = parse_resumption_token(response.content)
+    # Extract records
+    records = []
+    for record in root.findall(".//{http://www.openarchives.org/OAI/2.0/}record"):
+        metadata = record.find(".//{http://www.openarchives.org/OAI/2.0/}metadata")
+        if metadata is not None:
+            records.append(ET.tostring(metadata, encoding="unicode"))
+
+    # Extract resumptionToken
+    resumption_token_element = root.find(".//{http://www.openarchives.org/OAI/2.0/}resumptionToken")
+    next_resumption_token = resumption_token_element.text if resumption_token_element is not None else None
 
     return records, next_resumption_token

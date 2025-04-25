@@ -62,16 +62,24 @@ def main():
         print(f"Error: The dataset_name argument is required for the '{verb}' verb.")
         sys.exit(1)
 
-    # Fetch records
-    result = fetch_records(endpoint, verb, set_name=dataset_name, test_limit=test_limit)
+    # Fetch records with resumption token handling
+    all_records = []
+    resumption_token = None
+
+    while True:
+        result, resumption_token = fetch_records(endpoint, verb, set_name=dataset_name, test_limit=test_limit, resumption_token=resumption_token)
+        all_records.extend(result)
+
+        if not resumption_token:
+            break
 
     # Save records
     if verb == "ListRecords":
-        save_to_csv(result, output_file)
+        save_to_csv(all_records, output_file)
         if save_xml:
             xml_output_file = output_file.replace(".csv", ".xml")
             xslt_path = os.path.join("xslt", "oai2.xsl")
-            save_to_xml(result, xml_output_file, stylesheet=xslt_path)
+            save_to_xml(all_records, xml_output_file, stylesheet=xslt_path)
     else:
         print("Non-ListRecords verbs are not yet supported.")
 

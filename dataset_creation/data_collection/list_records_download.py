@@ -91,23 +91,38 @@ def interactive_main():
         print("Non-ListRecords verbs are not yet supported.")
 
 def main():
-    if len(sys.argv) == 1:
-        interactive_main()
-    elif len(sys.argv) == 3:
-        dataset_name = sys.argv[1]
-        output_file = sys.argv[2]
-        endpoint = "https://www.culturaitalia.it/oaiProviderCI/OAIHandler"
-        
-        print(f"Fetching records for dataset: {dataset_name}")
-        records = fetch_records(endpoint, dataset_name)
-        print(f"Fetched {len(records)} records.")
-        
-        print(f"Saving records to {output_file}")
-        save_to_csv(records, output_file)
-        print("Done.")
-    else:
-        print("Usage: python script.py or python script.py <dataset_name> <output_file>")
+    if len(sys.argv) < 4:
+        print("Usage: python list_records_download.py <verb> <dataset_name> <output_file> [--test] [--xml] [--csv]")
+        print("Example: python list_records_download.py ListRecords museid_oa_parthenos output output.csv --test --xml --csv")
         sys.exit(1)
+    
+    verb = sys.argv[1]
+    dataset_name = sys.argv[2]
+    output_file = sys.argv[3]
+    test = "--test" in sys.argv
+    save_as_xml = "--xml" in sys.argv
+    save_as_csv = "--csv" in sys.argv
+    endpoint = "https://www.culturaitalia.it/oaiProviderCI/OAIHandler"
+
+    if not save_as_xml and not save_as_csv:
+        print("Error: You must specify at least one output format: --xml or --csv.")
+        sys.exit(1)
+
+    print(f"Fetching records for dataset: {dataset_name} with verb: {verb}")
+    records = fetch_records(endpoint, dataset_name, verb=verb, test_limit=20 if test else None)
+    print(f"Fetched {len(records)} records.")
+
+    if save_as_csv:
+        csv_output_file = output_file if output_file.endswith(".csv") else f"{output_file}.csv"
+        print(f"Saving records to {csv_output_file}")
+        save_to_csv(records, csv_output_file)
+
+    if save_as_xml:
+        xml_output_file = output_file if output_file.endswith(".xml") else f"{output_file}.xml"
+        print(f"Saving records to {xml_output_file}")
+        save_to_xml(records, xml_output_file)
+
+    print("Done.")
 
 if __name__ == "__main__":
     main()

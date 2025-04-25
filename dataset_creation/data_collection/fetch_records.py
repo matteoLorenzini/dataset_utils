@@ -3,10 +3,10 @@ import xml.etree.ElementTree as ET
 import sys
 from tqdm import tqdm
 
-def fetch_records(endpoint, set_name, metadata_prefix="oai_dc"):
+def fetch_records(endpoint, set_name, verb="ListRecords", metadata_prefix="oai_dc", test_limit=None):
     records = []
     params = {
-        "verb": "ListRecords",
+        "verb": verb,
         "metadataPrefix": metadata_prefix,
         "set": set_name
     }
@@ -46,6 +46,10 @@ def fetch_records(endpoint, set_name, metadata_prefix="oai_dc"):
                             })
                             pbar.update(1)
                             found_records = True
+
+                            # Stop if test limit is reached
+                            if test_limit and len(records) >= test_limit:
+                                return records
                 
                 if not found_records:
                     break

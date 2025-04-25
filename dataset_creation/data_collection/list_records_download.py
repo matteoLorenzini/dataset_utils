@@ -18,7 +18,7 @@ VERBS = {
     "5": "ListRecords"
 }
 
-def main():
+def interactive_main():
     # Define the interactive prompts using questionary
     endpoint = questionary.select(
         "Choose the endpoint to fetch data from:",
@@ -89,6 +89,25 @@ def main():
             save_to_xml(all_records, xml_output_file, stylesheet=xslt_path)
     else:
         print("Non-ListRecords verbs are not yet supported.")
+
+def main():
+    if len(sys.argv) == 1:
+        interactive_main()
+    elif len(sys.argv) == 3:
+        dataset_name = sys.argv[1]
+        output_file = sys.argv[2]
+        endpoint = "https://www.culturaitalia.it/oaiProviderCI/OAIHandler"
+        
+        print(f"Fetching records for dataset: {dataset_name}")
+        records = fetch_records(endpoint, dataset_name)
+        print(f"Fetched {len(records)} records.")
+        
+        print(f"Saving records to {output_file}")
+        save_to_csv(records, output_file)
+        print("Done.")
+    else:
+        print("Usage: python script.py or python script.py <dataset_name> <output_file>")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()

@@ -40,19 +40,10 @@ def save_to_csv(records, output_file):
     Save records to a CSV file.
     """
     try:
-        if not records:
-            print("No records to save.")
-            return
-
-        # Dynamically determine fieldnames from the first record
-        if isinstance(records[0], dict):
-            fieldnames = records[0].keys()
-        else:
-            print("Error: Records are not in the expected dictionary format.")
-            sys.exit(1)
-
         with open(output_file, mode='w', newline='', encoding='utf-8') as csvfile:
+            fieldnames = ["title", "description", "type", "subject"]
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            
             writer.writeheader()
             for record in records:
                 writer.writerow(record)

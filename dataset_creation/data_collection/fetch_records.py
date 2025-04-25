@@ -1,53 +1,64 @@
 import requests
 import xml.etree.ElementTree as ET
-from tqdm import tqdm
 import sys
+from tqdm import tqdm
 
-def fetch_records(endpoint, verb, set_name=None, test_limit=None, resumption_token=None):
-    """
-    Fetch records from the OAI-PMH endpoint.
-    """
-    params = {"verb": verb}
-    if resumption_token:
-        params["resumptionToken"] = resumption_token
-    else:
-        if set_name:
-            params["set"] = set_name
-        params["metadataPrefix"] = "oai_dc"
-
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36"
-    }
-
-    try:
-        response = requests.get(endpoint, params=params, headers=headers)
-        print(f"Request URL: {response.url}")  # Debugging: Print the full request URL
-        print(f"Request Headers: {response.request.headers}")  # Debugging: Print request headers
-        response.raise_for_status()
-    except requests.exceptions.HTTPError as e:
-        print(f"HTTP Error: {e.response.status_code} - {e.response.reason}")
-        print(f"Response Content: {response.text}")  # Print the full response content
-        print(f"Request URL: {response.url}")  # Print the full request URL
-        sys.exit(1)
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching records: {e}")
-        sys.exit(1)
-
-    # Parse the XML response
-    try:
-        root = ET.fromstring(response.content)
-    except ET.ParseError as e:
-        print(f"Error parsing XML response: {e}")
-        sys.exit(1)
-
-    # Extract records and resumptionToken
+def fetch_records(endpoint, set_name, metadata_prefix="oai_dc"):
     records = []
-    for record in root.findall(".//{http://www.openarchives.org/OAI/2.0/}record"):
-        metadata = record.find(".//{http://www.openarchives.org/OAI/2.0/}metadata")
-        if metadata is not None:
-            records.append(ET.tostring(metadata, encoding="unicode"))
-
-    resumption_token_element = root.find(".//{http://www.openarchives.org/OAI/2.0/}resumptionToken")
-    next_resumption_token = resumption_token_element.text if resumption_token_element is not None else None
-
-    return records, next_resumption_token
+    params = {
+        "verb": "ListRecords",
+        "metadataPrefix": metadata_prefix,
+        "set": set_name
+    }
+    
+    try:
+        with tqdm(desc="Fetching records", unit="record", bar_format="{l_bar}{bar}| {n_fmt} records [{elapsed}<{remaining}, {rate_fmt}]") as pbar:
+            while True:
+                response = requests.get(endpoint, params=params)
+                if response.status_code != 200:
+                    print(f"Error: Unable to fetch records. HTTP Status Code: {response.status_code}")
+                    sys.exit(1)
+                
+                root = ET.fromstring(response.content)
+                ns = {
+                    'oai': 'http://www.openarchives.org/OAI/2.0/',
+                    'dc': 'http://purl.org/dc/elements/1.1/'
+                }
+                
+                found_records = False
+                for record in root.findall('.//oai:record', ns):
+                    metadata = record.find('oai:metadata', ns)
+                    if metadata is not None:
+                        dc = metadata.find('dc:dc', ns)
+                        if dc is not None:
+                            title = dc.find('dc:title', ns)
+                            description = dc.find('dc:description', ns)
+                            subjects = dc.findall('dc:subject', ns)
+                            subject_values = "; ".join(subject.text for subject in subjects if subject is not None)
+                            types = dc.findall('dc:type', ns)
+                            type_values = "; ".join(type_.text for type_ in types if type_ is not None)
+                            
+                            records.append({
+                                "title": title.text if title is not None else "",
+                                "description": description.text if description is not None else "",
+                                "type": type_values,
+                                "subject": subject_values
+                            })
+                            pbar.update(1)
+                            found_records = True
+                
+                if not found_records:
+                    break
+                
+                resumption_token = root.find('.//oai:resumptionToken', ns)
+                if resumption_token is None or resumption_token.text is None:
+                    break
+                params = {
+                    "verb": "ListRecords",
+                    "resumptionToken": resumption_token.text
+                }
+    except Exception as e:
+        print(f"Error during fetching records: {e}")
+        sys.exit(1)
+    
+    return records

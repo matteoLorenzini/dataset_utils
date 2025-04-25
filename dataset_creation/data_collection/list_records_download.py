@@ -141,59 +141,75 @@ def fetch_records(endpoint, verb, set_name=None, metadata_prefix="pico", test_li
 
     try:
         with tqdm(desc=f"Fetching {verb.lower()}", unit="record", bar_format="{l_bar}{bar}| {n_fmt} records [{elapsed}<{remaining}, {rate_fmt}]") as pbar:
-            response = requests.get(endpoint, params=params)
-            if response.status_code != 200:
-                print(f"Error: Unable to fetch data. HTTP Status Code: {response.status_code}")
-                sys.exit(1)
-            
-            root = ET.fromstring(response.content)
-            ns = {
-                'oai': 'http://www.openarchives.org/OAI/2.0/',
-                'dc': 'http://purl.org/dc/elements/1.1/',
-                'pico': 'http://purl.org/pico/1.0/',
-                'dcterms': 'http://purl.org/dc/terms/'
-            }
-            
-            if verb == "ListRecords":
-                found_records = False
-                for record in root.findall('.//pico:record', ns):  # Adjusted to find <pico:record>
-                    identifier = record.find('dc:identifier', ns)
-                    title = record.find('dc:title', ns)
-                    description = record.find('dc:description', ns)
-                    
-                    # Handle multiple dc:subject elements
-                    subjects = record.findall('dc:subject', ns)
-                    subject_values = "; ".join(subject.text or "" for subject in subjects if subject is not None)
-                    
-                    # Handle multiple dc:type elements
-                    types = record.findall('dc:type', ns)
-                    type_values = "; ".join(type_.text or "" for type_ in types if type_ is not None)
-                    
-                    records.append({
-                        "identifier": identifier.text if identifier is not None else "",
-                        "title": title.text if title is not None else "",
-                        "description": description.text if description is not None else "",
-                        "type": type_values,
-                        "subject": subject_values
-                    })
-                    pbar.update(1)
-                    found_records = True
-
-                    # Stop fetching if test limit is reached
-                    if test_limit and len(records) >= test_limit:
-                        print("\nTest limit reached. Stopping fetch.")
-                        return records
+            while True:
+                response = requests.get(endpoint, params=params)
+                if response.status_code != 200:
+                    print(f"Error: Unable to fetch data. HTTP Status Code: {response.status_code}")
+                    sys.exit(1)
                 
-                if not found_records:
-                    print("No records found.")
-                return records
-            else:
-                # For other verbs, return the raw XML response
-                return ET.tostring(root, encoding="unicode")
+                root = ET.fromstring(response.content)
+                ns = {
+                    'oai': 'http://www.openarchives.org/OAI/2.0/',
+                    'dc': 'http://purl.org/dc/elements/1.1/',
+                    'pico': 'http://purl.org/pico/1.0/',
+                    'dcterms': 'http://purl.org/dc/terms/'
+                }
+                
+                if verb == "ListRecords":
+                    found_records = False
+                    for record in root.findall('.//oai:record', ns):
+                        metadata = record.find('oai:metadata', ns)
+                        if metadata is not None:
+                            dc = metadata.find('dc:dc', ns)
+                            if dc is not None:
+                                identifier = dc.find('dc:identifier', ns)
+                                title = dc.find('dc:title', ns)
+                                description = dc.find('dc:description', ns)
+                                
+                                # Handle multiple dc:subject elements
+                                subjects = dc.findall('dc:subject', ns)
+                                subject_values = "; ".join(subject.text or "" for subject in subjects if subject is not None)
+                                
+                                # Handle multiple dc:type elements
+                                types = dc.findall('dc:type', ns)
+                                type_values = "; ".join(type_.text or "" for type_ in types if type_ is not None)
+                                
+                                records.append({
+                                    "identifier": identifier.text if identifier is not None else "",
+                                    "title": title.text if title is not None else "",
+                                    "description": description.text if description is not None else "",
+                                    "type": type_values,
+                                    "subject": subject_values
+                                })
+                                pbar.update(1)
+                                found_records = True
+
+                                # Stop fetching if test limit is reached
+                                if test_limit and len(records) >= test_limit:
+                                    print("\nTest limit reached. Stopping fetch.")
+                                    return records
+                    
+                    if not found_records:
+                        print("No records found.")
+                        break
+
+                    # Check for resumptionToken for pagination
+                    resumption_token = root.find('.//oai:resumptionToken', ns)
+                    if resumption_token is None or resumption_token.text is None:
+                        break
+                    params = {
+                        "verb": "ListRecords",
+                        "resumptionToken": resumption_token.text
+                    }
+                else:
+                    # For other verbs, return the raw XML response
+                    return ET.tostring(root, encoding="unicode")
 
     except Exception as e:
         print(f"Error during fetching data: {e}")
         sys.exit(1)
+
+    return records
 
 def save_to_csv(records, output_file):
     try:

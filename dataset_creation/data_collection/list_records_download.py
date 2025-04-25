@@ -57,6 +57,13 @@ def main():
     verb = VERBS[verb_key]
     test_limit = 20 if test else None
 
+    # Print selected options
+    print(f"Endpoint: {endpoint}")
+    print(f"Verb: {verb}")
+    print(f"Dataset Name: {dataset_name}")
+    print(f"Output File: {output_file}")
+    print(f"Test Limit: {test_limit}")
+
     # Validate dataset_name if required
     if verb in ["ListRecords", "ListIdentifiers"] and not dataset_name:
         print(f"Error: The dataset_name argument is required for the '{verb}' verb.")

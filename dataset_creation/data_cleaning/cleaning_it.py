@@ -2,6 +2,7 @@ import pandas as pd
 import re
 import string
 import unicodedata
+from sklearn.preprocessing import StandardScaler, LabelEncoder
 from nltk.corpus import stopwords
 
 # Download necessary NLTK resources (run this once)
@@ -13,6 +14,22 @@ except LookupError:
 
 # Define Italian stopwords globally
 ITALIAN_STOPWORDS = set(stopwords.words('italian'))
+
+def fix_encoding(text):
+    """
+    Fixes encoding issues in a string by attempting to re-encode and decode it.
+
+    Args:
+        text (str): The input string with potential encoding issues.
+
+    Returns:
+        str: The fixed string.
+    """
+    try:
+        return text.encode('latin1').decode('utf-8')
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        # In case it's already correctly encoded or cannot be fixed
+        return text
 
 def clean_italian_description(text):
     """
@@ -27,6 +44,9 @@ def clean_italian_description(text):
     """
     if pd.isna(text):  # Handle NaN values
         return ""
+
+    # Fix encoding issues
+    text = fix_encoding(text)
 
     # Convert to lowercase
     text = text.lower()
@@ -56,10 +76,57 @@ def clean_italian_description(text):
 
     return cleaned_text
 
+def transform_data(df):
+    """
+    Transforms the data for machine learning, including scaling numerical features
+    and encoding categorical variables.
+
+    Args:
+        df (pd.DataFrame): The input DataFrame.
+
+    Returns:
+        pd.DataFrame: The transformed DataFrame.
+    """
+    # Scale numerical features
+    scaler = StandardScaler()
+    if 'numerical_feature' in df.columns:  # Replace with actual numerical column names
+        df['numerical_feature_scaled'] = scaler.fit_transform(df[['numerical_feature']])
+
+    # Encode categorical variables
+    encoder = LabelEncoder()
+    if 'categorical_feature' in df.columns:  # Replace with actual categorical column names
+        df['categorical_feature_encoded'] = encoder.fit_transform(df['categorical_feature'])
+
+    return df
+
+def validate_data(df):
+    """
+    Validates the data to ensure accuracy and consistency.
+
+    Args:
+        df (pd.DataFrame): The input DataFrame.
+
+    Returns:
+        bool: True if the data is valid, False otherwise.
+    """
+    # Check for missing values
+    if df.isnull().sum().any():
+        print("Warning: Missing values detected.")
+        return False
+
+    # Check for duplicate rows
+    if df.duplicated().any():
+        print("Warning: Duplicate rows detected.")
+        return False
+
+    # Additional validation checks can be added here
+    return True
+
 def load_and_clean_italian_descriptions_from_csv(file_paths):
     """
-    Loads Italian text data from multiple CSV files, performs cleaning on the 'titolo' and
-    'descrizione' columns, removes duplicate descriptions, and saves the DataFrame with cleaned columns.
+    Loads Italian text data from multiple CSV files, performs cleaning on the 'descrizione' column
+    (and 'titolo' if present), removes duplicate descriptions, transforms the data, validates it,
+    and saves the DataFrame with cleaned and transformed columns.
 
     Args:
         file_paths (list of str): A list containing the paths to the CSV files.
@@ -67,26 +134,47 @@ def load_and_clean_italian_descriptions_from_csv(file_paths):
     for file_path in file_paths:
         try:
             df = pd.read_csv(file_path)
-            # Print the first 5 rows of the DataFrame
             print(f"\nFirst 5 rows of the DataFrame from {file_path}:")
             print(df.head())
 
-            # Ensure the required columns exist
-            if 'titolo' not in df.columns or 'descrizione' not in df.columns:
-                print(f"Warning: 'titolo' or 'descrizione' column not found in {file_path}. Skipping this file.")
+            # Ensure the required column exists
+            if 'descrizione' not in df.columns:
+                print(f"Warning: 'descrizione' column not found in {file_path}. Skipping this file.")
                 continue
 
-            # Clean the 'titolo' and 'descrizione' columns
-            df['titolo'] = df['titolo'].apply(clean_italian_description)
+            # Debug: Check for missing values
+            print(f"\nMissing values in {file_path}:")
+            print(df.isnull().sum())
+
+            # Drop rows with missing descrizione
+            drop_cols = ['descrizione']
+            # If titolo exists, drop rows with missing titolo as well
+            if 'titolo' in df.columns:
+                drop_cols.append('titolo')
+            df = df.dropna(subset=drop_cols)
+            print(f"Rows remaining after dropping missing values in {drop_cols}: {len(df)}")
+
+            # Clean the 'descrizione' column
             df['descrizione'] = df['descrizione'].apply(clean_italian_description)
+
+            # Clean the 'titolo' column if it exists
+            if 'titolo' in df.columns:
+                df['titolo'] = df['titolo'].apply(clean_italian_description)
 
             # Remove duplicate descriptions
             df = df.drop_duplicates(subset=['descrizione'], keep='first')
 
-            # Save the DataFrame with cleaned columns replacing the originals
-            output_file = file_path.replace('.csv', '_cleaned.csv')
+            # Transform the data
+            df = transform_data(df)
+
+            # Validate the data
+            if not validate_data(df):
+                print(f"Validation failed for {file_path}. Proceeding to save the cleaned data.")
+
+            # Save the DataFrame with cleaned and transformed columns
+            output_file = file_path.replace('.csv', '_cleaned_transformed.csv')
             df.to_csv(output_file, index=False)
-            print(f"Cleaned data saved to: {output_file}")
+            print(f"Cleaned and transformed data saved to: {output_file}")
 
         except FileNotFoundError:
             print(f"Error: File not found at {file_path}")
@@ -96,9 +184,14 @@ def load_and_clean_italian_descriptions_from_csv(file_paths):
 if __name__ == "__main__":
     # Updated file paths
     file_paths = [
-        '../../CH_IT/CSV/A/architettura.csv',
-        '../../CH_IT/CSV/Ar/archeologia.csv',
-        '../../CH_IT/CSV/dea/demoetnoantropologici.csv',
-        '../../CH_IT/CSV/vaw/opere_arte_visiva.csv'
+        '../../../dataset/CH_IT/architettura/architettura.csv',
+        '../../../dataset/CH_IT/architettura/A.csv',
+        '../../../dataset/CH_IT/archeologia/archeologia.csv',
+        '../../../dataset/CH_IT/archeologia/Ar.csv',
+        '../../../dataset/CH_IT/dea/demoetnoantropologici.csv',
+        '../../../dataset/CH_IT/opere_arte_visiva/opere_arte_visiva.csv',
+        '../../../dataset/CH_IT/opere_arte_visiva/museid_oa_parthenos.csv',
+        '../../../dataset/CH_IT/opere_arte_visiva/vaw.csv',
+        '../../../dataset/CH_IT/total/all.csv'      
     ]
     load_and_clean_italian_descriptions_from_csv(file_paths)
